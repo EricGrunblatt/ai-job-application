@@ -28,6 +28,12 @@ The system must be designed as a **human-in-the-loop application assistant**, no
 
 The AI should do the tedious work. The user retains control over consequential actions, especially final submission.
 
+## Active Project Status
+
+Use the project checklist in [PROJECT_CHECKLIST.md](PROJECT_CHECKLIST.md) as the current source of truth for what has been completed, in progress, and still pending.
+
+Agents should update this checklist when they begin or finish work. If a milestone is already marked complete, do not rework it unless the user explicitly asks for a change.
+
 ---
 
 # 2. Primary Goal
