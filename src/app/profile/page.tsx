@@ -422,9 +422,13 @@ export default function ProfilePage() {
                                 <input
                                   type="date"
                                   value={role.endDate ?? ""}
-                                  onChange={(event) =>
-                                    updateRole(companyIndex, roleIndex, { endDate: event.target.value })
-                                  }
+                                  onChange={(event) => {
+                                    const nextEndDate = event.target.value || undefined;
+                                    updateRole(companyIndex, roleIndex, {
+                                      endDate: nextEndDate,
+                                      current: !nextEndDate,
+                                    });
+                                  }}
                                 />
                               </label>
                               <label className="checkbox-field">
