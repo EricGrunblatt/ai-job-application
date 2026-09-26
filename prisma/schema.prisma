@@ -4,37 +4,37 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Candidate {
-  id                  String               @id @default(cuid())
-  firstName           String
-  lastName            String
-  email               String
-  phone               String?
-  city                String?
-  state               String?
-  country             String?
-  linkedInUrl         String?
-  githubUrl           String?
-  portfolioUrl        String?
-  summary             String?
-  remotePreference    String?
-  willingnessToRelocate Boolean? 
-  minimumSalary       Int?
-  preferredSalary     Int?
-  targetRoles         String[]
-  preferredLocations  String[]
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  skills              Skill[]
-  workExperiences     WorkExperience[]
-  education           Education[]
-  projects            Project[]
-  certifications      Certification[]
-  candidateFacts      CandidateFact[]
-  preferences         CandidatePreference?
+  id                    String               @id @default(cuid())
+  firstName             String
+  lastName              String
+  email                 String
+  phone                 String?
+  city                  String?
+  state                 String?
+  country               String?
+  linkedInUrl           String?
+  githubUrl             String?
+  portfolioUrl          String?
+  summary               String?
+  remotePreference      String?
+  willingnessToRelocate Boolean?
+  minimumSalary         Int?
+  preferredSalary       Int?
+  targetRoles           String[]
+  preferredLocations    String[]
+  profileData           Json?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  skills                Skill[]
+  workExperiences       WorkExperience[]
+  education             Education[]
+  projects              Project[]
+  certifications        Certification[]
+  candidateFacts        CandidateFact[]
+  preferences           CandidatePreference?
 }
 
 model CandidatePreference {

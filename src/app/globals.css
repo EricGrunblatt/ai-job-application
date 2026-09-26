@@ -97,6 +97,24 @@ body {
   font-size: 0.96rem;
 }
 
+.profile-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.profile-action-toggle {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--foreground);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .profile-badges {
   display: flex;
   flex-wrap: wrap;
@@ -117,6 +135,7 @@ body {
 
 .profile-body {
   padding: 28px 32px 32px;
+  width: 100%;
 }
 
 .profile-grid {
@@ -124,9 +143,11 @@ body {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 22px;
   margin-bottom: 24px;
+  width: 100%;
 }
 
 .profile-card {
+  width: 100%;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.96));
   border: 1px solid var(--border);
   border-radius: 22px;
@@ -193,7 +214,21 @@ body {
   gap: 10px;
 }
 
-.skill-chip {
+.skill-editor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.skill-chip,
+.skill-tag {
   background: var(--surface-soft);
   border: 1px solid var(--border);
   color: var(--foreground);
@@ -201,6 +236,42 @@ body {
   padding: 8px 12px;
   font-size: 0.78rem;
   font-weight: 600;
+}
+
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  border-color: rgba(29, 78, 216, 0.14);
+}
+
+.skill-tag button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(29, 78, 216, 0.1);
+  color: var(--brand-strong);
+  font-size: 0.8rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.skill-input {
+  flex: 1 1 140px;
+  min-width: 140px;
+  border: none;
+  background: transparent;
+  color: var(--foreground);
+  font-size: 0.9rem;
+  padding: 6px 0;
+  outline: none;
 }
 
 .experience-stack {
@@ -227,6 +298,20 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
+.company-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.company-date-range {
+  font-size: 0.8rem;
+  color: var(--foreground-soft);
+  font-weight: 600;
+}
+
 .company-name {
   margin: 0;
   font-size: 1.2rem;
@@ -237,6 +322,103 @@ body {
 .company-location {
   font-size: 0.84rem;
   color: var(--foreground-soft);
+}
+
+.company-editor-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+}
+
+.company-name-field,
+.company-location-field {
+  min-width: 180px;
+  flex: 1;
+}
+
+.editor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.editor-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--foreground-soft);
+}
+
+.editor-field-wide {
+  grid-column: 1 / -1;
+}
+
+.editor-field input,
+.editor-field select,
+.editor-field textarea,
+.editor-input,
+.editor-textarea {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--foreground);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+  width: 100%;
+}
+
+.editor-textarea,
+.editor-field textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.role-header.editable-role-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(140px, 0.8fr)) auto;
+  align-items: end;
+  gap: 10px;
+}
+
+.checkbox-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--foreground);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+  min-height: 42px;
+}
+
+.bullet-editor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bullet-editor {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(248, 250, 252, 0.9);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.edit-education-list {
+  gap: 12px;
 }
 
 .role-stack {
@@ -324,7 +506,8 @@ body {
 }
 
 @media (max-width: 860px) {
-  .profile-grid {
+  .profile-grid,
+  .editor-grid {
     grid-template-columns: 1fr;
   }
 
@@ -332,7 +515,29 @@ body {
     padding: 24px 20px 20px;
   }
 
+  .profile-actions {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .profile-action-toggle {
+    width: 100%;
+  }
+
   .profile-body {
     padding: 20px;
+  }
+
+  .company-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .company-meta-row {
+    justify-content: flex-start;
+  }
+
+  .role-header.editable-role-header {
+    grid-template-columns: 1fr;
   }
 }
