@@ -1,8 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+
+  --background: #f3f7fb;
+  --background-strong: #eaf1fb;
+  --surface: #ffffff;
+  --surface-alt: #edf4ff;
+  --surface-soft: #f8fbff;
+  --foreground: #0f172a;
+  --foreground-muted: #475569;
+  --foreground-soft: #64748b;
+  --border: #dfe8f3;
+  --border-strong: #c9d7ea;
+  --brand: #1d4ed8;
+  --brand-strong: #163ea8;
+  --brand-soft: #dbeafe;
+  --success: #0f766e;
+  --success-soft: #d1fae5;
+  --shadow: rgba(15, 23, 42, 0.08);
 }
 
 @theme inline {
@@ -12,15 +28,311 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
 }
 
 body {
-  background: var(--background);
+  margin: 0;
+  background:
+    radial-gradient(circle at top, rgba(191, 219, 254, 0.42), transparent 28%),
+    linear-gradient(180deg, var(--background-strong) 0%, var(--background) 100%);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.profile-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 64px 24px 80px;
+}
+
+.profile-shell {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  box-shadow: 0 20px 40px var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.profile-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 32px 32px 28px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(239, 246, 255, 0.75));
+  border-radius: 28px 28px 0 0;
+}
+
+.profile-kicker {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-strong);
+}
+
+.profile-name {
+  margin: 0;
+  font-size: clamp(2.1rem, 3vw, 3rem);
+  line-height: 1.1;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
+.profile-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+  color: var(--foreground-muted);
+  font-size: 0.96rem;
+}
+
+.profile-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.profile-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  border: 1px solid rgba(29, 78, 216, 0.12);
+}
+
+.profile-body {
+  padding: 28px 32px 32px;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  margin-bottom: 24px;
+}
+
+.profile-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.96));
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.04);
+}
+
+.profile-card h2,
+.company-card h3,
+.role-card h4 {
+  margin: 0 0 14px;
+  color: var(--foreground);
+}
+
+.profile-card h2 {
+  font-size: 1.08rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.profile-summary,
+.profile-meta-copy,
+.role-copy,
+.experience-bullet,
+.skill-chip,
+.education-item {
+  color: var(--foreground-muted);
+}
+
+.preferences-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+  margin-top: 14px;
+}
+
+.preference-item {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.preference-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--foreground-soft);
+}
+
+.preference-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.4;
+}
+
+.skill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skill-chip {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.experience-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.company-card {
+  background: linear-gradient(180deg, var(--surface) 0%, #f9fbff 100%);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 20px;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.025);
+}
+
+.company-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.company-name {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
+.company-location {
+  font-size: 0.84rem;
+  color: var(--foreground-soft);
+}
+
+.role-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.role-card {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 16px 16px 12px;
+}
+
+.role-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.role-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.role-dates {
+  font-size: 0.76rem;
+  color: var(--foreground-soft);
+  white-space: nowrap;
+}
+
+.role-bullets {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.experience-bullet {
+  font-size: 0.96rem;
+  line-height: 1.65;
+  color: var(--foreground-muted);
+}
+
+.metric-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: var(--success);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.skill-inline {
+  display: inline-flex;
+  margin-top: 8px;
+  margin-right: 6px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  padding: 4px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.education-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.education-item {
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.education-item:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+@media (max-width: 860px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-header {
+    padding: 24px 20px 20px;
+  }
+
+  .profile-body {
+    padding: 20px;
+  }
 }

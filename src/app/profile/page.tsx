@@ -4,122 +4,142 @@ export default async function ProfilePage() {
   const profile = await getCandidateProfile();
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-10 text-slate-900">
-      <header className="mb-8 border-b border-slate-200 pb-6">
-        <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">
-          Candidate profile
-        </p>
-        <h1 className="mt-2 text-3xl font-bold">
-          {profile.firstName} {profile.lastName}
-        </h1>
-        <div className="mt-3 flex flex-wrap gap-3 text-sm text-slate-600">
-          <span>{profile.email}</span>
-          <span>•</span>
-          <span>{profile.phone}</span>
-          <span>•</span>
-          <span>
-            {profile.city}, {profile.state}
-          </span>
-        </div>
-      </header>
+    <main className="profile-page">
+      <div className="profile-shell">
+        <header className="profile-header">
+          <div>
+            <p className="profile-kicker">Candidate profile</p>
+            <h1 className="profile-name">
+              {profile.firstName} {profile.lastName}
+            </h1>
+            <div className="profile-meta">
+              <span>{profile.email}</span>
+              <span>•</span>
+              <span>{profile.phone}</span>
+              <span>•</span>
+              <span>
+                {profile.city}, {profile.state}
+              </span>
+            </div>
+          </div>
 
-      <section className="mb-8 grid gap-6 md:grid-cols-2">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="mb-3 text-lg font-semibold">Summary</h2>
-          <p className="text-slate-700">{profile.summary}</p>
-        </div>
+          <div className="profile-badges">
+            <span className="profile-badge">{profile.remotePreference ?? "Open to roles"}</span>
+            <span className="profile-badge">{profile.targetRoles[0]}</span>
+          </div>
+        </header>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="mb-3 text-lg font-semibold">Preferences</h2>
-          <ul className="space-y-2 text-sm text-slate-700">
-            <li>Remote preference: {profile.remotePreference ?? "Not specified"}</li>
-            <li>Target roles: {profile.targetRoles.join(", ")}</li>
-            <li>Preferred locations: {profile.preferredLocations.join(", ")}</li>
-            <li>Salary target: ${profile.minimumSalary?.toLocaleString() ?? "n/a"} min</li>
-          </ul>
-        </div>
-      </section>
+        <div className="profile-body">
+          <section className="profile-grid">
+            <div className="profile-card">
+              <h2>Summary</h2>
+              <p className="profile-summary">{profile.summary}</p>
+            </div>
 
-      <section className="mb-8">
-        <h2 className="mb-4 text-xl font-semibold">Skills</h2>
-        <div className="flex flex-wrap gap-2">
-          {profile.skills.map((skill) => (
-            <span
-              key={`${skill.category}-${skill.name}`}
-              className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700"
-            >
-              {skill.name}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      <section className="mb-8">
-        <h2 className="mb-4 text-xl font-semibold">Experience</h2>
-        <div className="space-y-5">
-          {profile.workExperiences.map((job, index) => (
-            <div key={`${job.company}-${job.title}-${index}`} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <h3 className="text-lg font-semibold">{job.title}</h3>
-                  <p className="text-slate-600">{job.company}</p>
+            <div className="profile-card">
+              <h2>Preferences</h2>
+              <div className="preferences-grid">
+                <div className="preference-item">
+                  <span className="preference-label">Work style</span>
+                  <span className="preference-value">{profile.remotePreference ?? "Not specified"}</span>
                 </div>
-                <span className="text-sm text-slate-500">
-                  {job.startDate ?? "Unknown"} — {job.current ? "Present" : job.endDate ?? "Unknown"}
-                </span>
-              </div>
-              {job.description ? (
-                <p className="mt-3 text-sm text-slate-700">{job.description}</p>
-              ) : null}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mb-8">
-        <h2 className="mb-4 text-xl font-semibold">Verified facts</h2>
-        <div className="space-y-4">
-          {profile.candidateFacts.map((fact) => (
-            <div key={fact.id} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-medium text-slate-900">{fact.role}</p>
-                  <p className="text-sm text-slate-600">{fact.company}</p>
+                <div className="preference-item">
+                  <span className="preference-label">Salary floor</span>
+                  <span className="preference-value">${profile.minimumSalary?.toLocaleString() ?? "n/a"}</span>
                 </div>
-                <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-800">
-                  Verified
-                </span>
+                <div className="preference-item" style={{ gridColumn: "1 / -1" }}>
+                  <span className="preference-label">Target roles</span>
+                  <span className="preference-value">{profile.targetRoles.join(", ")}</span>
+                </div>
+                <div className="preference-item" style={{ gridColumn: "1 / -1" }}>
+                  <span className="preference-label">Preferred locations</span>
+                  <span className="preference-value">{profile.preferredLocations.join(", ")}</span>
+                </div>
               </div>
-              <p className="text-sm text-slate-700">{fact.text}</p>
-              {fact.metrics.length > 0 ? (
-                <ul className="mt-3 list-disc pl-5 text-sm text-slate-600">
-                  {fact.metrics.map((metric) => (
-                    <li key={`${fact.id}-${metric}`}>{metric}</li>
-                  ))}
-                </ul>
-              ) : null}
             </div>
-          ))}
-        </div>
-      </section>
+          </section>
 
-      <section>
-        <h2 className="mb-4 text-xl font-semibold">Education</h2>
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          {profile.education.map((edu, index) => (
-            <div key={`${edu.school}-${index}`}>
-              <p className="font-medium text-slate-900">{edu.school}</p>
-              <p className="text-slate-700">
-                {edu.degree} {edu.major ? `in ${edu.major}` : ""}
-              </p>
-              {edu.gpa ? <p className="text-sm text-slate-600">GPA: {edu.gpa}</p> : null}
-              {edu.graduationDate ? (
-                <p className="text-sm text-slate-600">Graduated: {edu.graduationDate}</p>
-              ) : null}
+          <section className="profile-card" style={{ marginBottom: "24px" }}>
+            <h2>Core skills</h2>
+            <div className="skill-list">
+              {profile.skills.map((skill) => (
+                <span key={`${skill.category}-${skill.name}`} className="skill-chip">
+                  {skill.name}
+                </span>
+              ))}
             </div>
-          ))}
+          </section>
+
+          <section style={{ marginBottom: "24px" }}>
+            <h2 style={{ margin: "0 0 16px", fontSize: "1.3rem", fontWeight: 800 }}>Experience</h2>
+            <div className="experience-stack">
+              {profile.companyExperiences.map((company) => (
+                <div key={company.company} className="company-card">
+                  <div className="company-header">
+                    <h3 className="company-name">{company.company}</h3>
+                    {company.location ? <span className="company-location">{company.location}</span> : null}
+                  </div>
+
+                  <div className="role-stack">
+                    {company.roles.map((role) => (
+                      <div key={`${company.company}-${role.title}`} className="role-card">
+                        <div className="role-header">
+                          <h4 className="role-title">{role.title}</h4>
+                          <span className="role-dates">
+                            {role.startDate ?? "Unknown"} — {role.current ? "Present" : role.endDate ?? "Unknown"}
+                          </span>
+                        </div>
+
+                        <ul className="role-bullets">
+                          {role.bullets.map((bullet, bulletIndex) => (
+                            <li key={`${company.company}-${role.title}-${bulletIndex}`} className="experience-bullet">
+                              {bullet.text}
+                              {bullet.metrics && bullet.metrics.length > 0 ? (
+                                <ul className="metric-list">
+                                  {bullet.metrics.map((metric) => (
+                                    <li key={`${company.company}-${role.title}-${bulletIndex}-${metric}`}>{metric}</li>
+                                  ))}
+                                </ul>
+                              ) : null}
+                              {bullet.skills && bullet.skills.length > 0 ? (
+                                <div style={{ marginTop: "10px" }}>
+                                  {bullet.skills.map((skill) => (
+                                    <span key={`${company.company}-${role.title}-${bulletIndex}-${skill}`} className="skill-inline">
+                                      {skill}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : null}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="profile-card">
+            <h2>Education</h2>
+            <div className="education-stack">
+              {profile.education.map((edu, index) => (
+                <div key={`${edu.school}-${index}`} className="education-item">
+                  <p className="company-name" style={{ marginBottom: "4px" }}>{edu.school}</p>
+                  <p className="profile-meta-copy">
+                    {edu.degree} {edu.major ? `in ${edu.major}` : ""}
+                  </p>
+                  {edu.gpa ? <p className="profile-meta-copy">GPA: {edu.gpa}</p> : null}
+                  {edu.graduationDate ? (
+                    <p className="profile-meta-copy">Graduated: {edu.graduationDate}</p>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
-      </section>
+      </div>
     </main>
   );
 }

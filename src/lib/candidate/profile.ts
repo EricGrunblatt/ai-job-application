@@ -55,39 +55,195 @@ export const ericGrunblattProfile: CandidateProfile = {
   workExperiences: [
     {
       company: "GEICO Tech",
-      title: "Senior Software Engineer",
-      startDate: "2026-07-01",
-      endDate: undefined,
       location: "United States",
-      description: "Release Platform Team",
-      current: true,
-    },
-    {
-      company: "GEICO Tech",
-      title: "Software Engineer II",
-      startDate: "2025-07-01",
-      endDate: "2026-06-30",
-      location: "United States",
-      description: "Release Platform Team",
-      current: false,
-    },
-    {
-      company: "GEICO Tech",
-      title: "Software Engineer I",
-      startDate: "2024-03-01",
-      endDate: "2025-06-30",
-      location: "United States",
-      description: "Observability Team",
-      current: false,
+      roles: [
+        {
+          title: "Senior Software Engineer",
+          startDate: "2026-07-01",
+          current: true,
+          bullets: [
+            {
+              text: "Architected a standardized CI/CD foundation that gave the organization reusable GitHub-based workflows for thousands of engineers and applications.",
+              metrics: ["Standardized workflows across the engineering org"],
+              skills: ["CI/CD standardization", "GitHub workflow design", "Platform engineering"],
+            },
+            {
+              text: "Built a deployment model that supported up to four environments with policy checks, release controls, and post-deployment verification at every stage.",
+              metrics: ["Four-environment delivery model"],
+              skills: ["Deployment automation", "Release governance", "Environment orchestration"],
+            },
+            {
+              text: "Created dependency-aware deployment orchestration for complex applications and monorepos so downstream releases only advanced after upstream work was validated.",
+              metrics: ["Improved release sequencing for multi-service delivery"],
+              skills: ["Monorepo release orchestration", "Deployment sequencing", "Platform design"],
+            },
+          ],
+        },
+        {
+          title: "Software Engineer II",
+          startDate: "2025-07-01",
+          endDate: "2026-06-30",
+          bullets: [
+            {
+              text: "Developed a release governance platform that enforced internal deployment policies across Azure DevOps and GitHub, covering more than 15,000 deployment pipelines.",
+              metrics: ["Governed 15,000+ deployment pipelines"],
+              skills: ["Azure DevOps", "GitHub deployment protection", "Release governance"],
+            },
+            {
+              text: "Automated onboarding and validation so teams could self-serve deployment setup without manual review, reducing setup time from 30 minutes to zero and driving adoption from 10% to 100%.",
+              metrics: ["Cut onboarding from 30 minutes to zero", "Raised adoption from 10% to 100%"],
+              skills: ["Developer enablement", "Workflow automation", "Platform self-service"],
+            },
+            {
+              text: "Partnered with platform, security, and application teams to improve release reliability and standardize deployment governance across the organization.",
+              metrics: ["Improved governance and release consistency"],
+              skills: ["Stakeholder collaboration", "Deployment reliability", "Governance"],
+            },
+          ],
+        },
+        {
+          title: "Software Engineer I",
+          startDate: "2024-03-01",
+          endDate: "2025-06-30",
+          bullets: [
+            {
+              text: "Developed and supported GEICO's enterprise observability platform using Grafana Loki and Prometheus to enable a broad migration away from Splunk.",
+              metrics: ["Enabled large-scale observability migration across the org"],
+              skills: ["Grafana Loki", "Prometheus", "Observability platform", "Splunk migration"],
+            },
+            {
+              text: "Led migration work for more than 2,000 Splunk queries, 300 dashboards, and 500 alerts using LogQL and PromQL, improving performance and reducing operational friction.",
+              metrics: ["2,000 queries migrated", "300 dashboards updated", "500 alerts remapped"],
+              skills: ["LogQL", "PromQL", "Dashboard migration", "Alert migration"],
+            },
+            {
+              text: "Facilitated weekly observability office hours for six months, coaching teams on migration strategy and best practices for groups spanning thousands of engineers.",
+              metrics: ["Three office-hours sessions each week for six months"],
+              skills: ["Observability enablement", "Best-practice coaching", "Developer education"],
+            },
+          ],
+        },
+      ],
     },
     {
       company: "Revelwood Solutions",
-      title: "Full Stack JavaScript Intern",
-      startDate: "2022-06-01",
-      endDate: "2022-08-31",
       location: "United States",
-      description: "Built internal tools and maintained production web applications.",
-      current: false,
+      roles: [
+        {
+          title: "Full Stack JavaScript Intern",
+          startDate: "2022-06-01",
+          endDate: "2022-08-31",
+          bullets: [
+            {
+              text: "Built internal web tools in JavaScript and TypeScript, including a Google Sheets extension that automated outbound email workflows.",
+              metrics: ["Automated internal email workflows"],
+              skills: ["JavaScript", "TypeScript", "jQuery", "Google Sheets automation"],
+            },
+            {
+              text: "Maintained and improved production applications built with Vue.js, Express.js, and MySQL that supported a large internal user base.",
+              metrics: ["Supported a large production user base"],
+              skills: ["Vue.js", "Express.js", "MySQL", "Production support"],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  companyExperiences: [
+    {
+      company: "GEICO Tech",
+      location: "United States",
+      roles: [
+        {
+          title: "Senior Software Engineer",
+          startDate: "2026-07-01",
+          current: true,
+          bullets: [
+            {
+              text: "Architected a standardized CI/CD foundation that gave the organization reusable GitHub-based workflows for thousands of engineers and applications.",
+              metrics: ["Standardized workflows across the engineering org"],
+              skills: ["CI/CD standardization", "GitHub workflow design", "Platform engineering"],
+            },
+            {
+              text: "Built a deployment model that supported up to four environments with policy checks, release controls, and post-deployment verification at every stage.",
+              metrics: ["Four-environment delivery model"],
+              skills: ["Deployment automation", "Release governance", "Environment orchestration"],
+            },
+            {
+              text: "Created dependency-aware deployment orchestration for complex applications and monorepos so downstream releases only advanced after upstream work was validated.",
+              metrics: ["Improved release sequencing for multi-service delivery"],
+              skills: ["Monorepo release orchestration", "Deployment sequencing", "Platform design"],
+            },
+          ],
+        },
+        {
+          title: "Software Engineer II",
+          startDate: "2025-07-01",
+          endDate: "2026-06-30",
+          bullets: [
+            {
+              text: "Developed a release governance platform that enforced internal deployment policies across Azure DevOps and GitHub, covering more than 15,000 deployment pipelines.",
+              metrics: ["Governed 15,000+ deployment pipelines"],
+              skills: ["Azure DevOps", "GitHub deployment protection", "Release governance"],
+            },
+            {
+              text: "Automated onboarding and validation so teams could self-serve deployment setup without manual review, reducing setup time from 30 minutes to zero and driving adoption from 10% to 100%.",
+              metrics: ["Cut onboarding from 30 minutes to zero", "Raised adoption from 10% to 100%"],
+              skills: ["Developer enablement", "Workflow automation", "Platform self-service"],
+            },
+            {
+              text: "Partnered with platform, security, and application teams to improve release reliability and standardize deployment governance across the organization.",
+              metrics: ["Improved governance and release consistency"],
+              skills: ["Stakeholder collaboration", "Deployment reliability", "Governance"],
+            },
+          ],
+        },
+        {
+          title: "Software Engineer I",
+          startDate: "2024-03-01",
+          endDate: "2025-06-30",
+          bullets: [
+            {
+              text: "Developed and supported GEICO's enterprise observability platform using Grafana Loki and Prometheus to enable a broad migration away from Splunk.",
+              metrics: ["Enabled large-scale observability migration across the org"],
+              skills: ["Grafana Loki", "Prometheus", "Observability platform", "Splunk migration"],
+            },
+            {
+              text: "Led migration work for more than 2,000 Splunk queries, 300 dashboards, and 500 alerts using LogQL and PromQL, improving performance and reducing operational friction.",
+              metrics: ["2,000 queries migrated", "300 dashboards updated", "500 alerts remapped"],
+              skills: ["LogQL", "PromQL", "Dashboard migration", "Alert migration"],
+            },
+            {
+              text: "Facilitated weekly observability office hours for six months, coaching teams on migration strategy and best practices for groups spanning thousands of engineers.",
+              metrics: ["Three office-hours sessions each week for six months"],
+              skills: ["Observability enablement", "Best-practice coaching", "Developer education"],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      company: "Revelwood Solutions",
+      location: "United States",
+      roles: [
+        {
+          title: "Full Stack JavaScript Intern",
+          startDate: "2022-06-01",
+          endDate: "2022-08-31",
+          bullets: [
+            {
+              text: "Built internal web tools in JavaScript and TypeScript, including a Google Sheets extension that automated outbound email workflows.",
+              metrics: ["Automated internal email workflows"],
+              skills: ["JavaScript", "TypeScript", "jQuery", "Google Sheets automation"],
+            },
+            {
+              text: "Maintained and improved production applications built with Vue.js, Express.js, and MySQL that supported a large internal user base.",
+              metrics: ["Supported a large production user base"],
+              skills: ["Vue.js", "Express.js", "MySQL", "Production support"],
+            },
+          ],
+        },
+      ],
     },
   ],
   education: [

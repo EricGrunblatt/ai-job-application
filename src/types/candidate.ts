@@ -22,14 +22,25 @@ export interface CandidateFact {
   verified: boolean;
 }
 
-export interface WorkExperience {
-  company: string;
+export interface ExperienceBullet {
+  text: string;
+  metrics?: string[];
+  skills?: string[];
+}
+
+export interface WorkRole {
   title: string;
   startDate?: string;
   endDate?: string;
   location?: string;
-  description?: string;
   current?: boolean;
+  bullets: ExperienceBullet[];
+}
+
+export interface CompanyExperience {
+  company: string;
+  location?: string;
+  roles: WorkRole[];
 }
 
 export interface EducationEntry {
@@ -81,7 +92,8 @@ export interface CandidateProfile {
   targetRoles: string[];
   preferredLocations: string[];
   skills: CandidateSkill[];
-  workExperiences: WorkExperience[];
+  workExperiences: CompanyExperience[];
+  companyExperiences: CompanyExperience[];
   education: EducationEntry[];
   projects: ProjectEntry[];
   certifications: Array<{
