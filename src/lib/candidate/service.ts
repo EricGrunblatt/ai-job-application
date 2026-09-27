@@ -18,7 +18,24 @@ function normalizeProfile(profile: CandidateProfile): CandidateProfile {
   };
 }
 
+async function isDatabaseAvailable(): Promise<boolean> {
+  if (!process.env.DATABASE_URL) {
+    return false;
+  }
+
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function getCandidateProfile(): Promise<CandidateProfile> {
+  if (!(await isDatabaseAvailable())) {
+    return ericGrunblattProfile;
+  }
+
   try {
     const candidate = await prisma.candidate.findFirst({
       orderBy: { createdAt: "asc" },
@@ -27,8 +44,8 @@ export async function getCandidateProfile(): Promise<CandidateProfile> {
     if (candidate?.profileData && typeof candidate.profileData === "object") {
       return normalizeProfile(candidate.profileData as unknown as CandidateProfile);
     }
-  } catch (error) {
-    console.warn("Falling back to seeded profile because Prisma is unavailable.", error);
+  } catch {
+    return ericGrunblattProfile;
   }
 
   return ericGrunblattProfile;
@@ -36,6 +53,10 @@ export async function getCandidateProfile(): Promise<CandidateProfile> {
 
 export async function saveCandidateProfile(profile: CandidateProfile): Promise<CandidateProfile> {
   const nextProfile = normalizeProfile(profile);
+
+  if (!(await isDatabaseAvailable())) {
+    return nextProfile;
+  }
 
   try {
     const existing = await prisma.candidate.findFirst({
@@ -94,8 +115,7 @@ export async function saveCandidateProfile(profile: CandidateProfile): Promise<C
     });
 
     return normalizeProfile((created.profileData as unknown as CandidateProfile) ?? nextProfile);
-  } catch (error) {
-    console.warn("Prisma profile save unavailable; returning in-memory profile.", error);
+  } catch {
     return nextProfile;
   }
 }

@@ -2,7 +2,7 @@
 
 .PHONY: install dev build start lint prisma-generate prisma-studio db-seed profile-check profile dev-setup help reset-db migrate generate test clean up down
 
-DB_URL='postgresql://user:password@localhost:5432/ai_job_application'
+DB_URL='postgresql://postgres:postgres@localhost:5432/ai_job_application'
 
 help:
 	@echo "Available commands:"
