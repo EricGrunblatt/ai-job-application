@@ -1,5 +1,106 @@
 import type { CandidateProfile } from "@/types/candidate";
 
+export function createEmptyExperienceBullet() {
+  return {
+    text: "",
+    metrics: [],
+    skills: [],
+  };
+}
+
+export function createEmptyWorkRole() {
+  return {
+    title: "",
+    startDate: "",
+    endDate: "",
+    location: "",
+    current: false,
+    bullets: [createEmptyExperienceBullet()],
+  };
+}
+
+export function createEmptyCompanyExperience() {
+  return {
+    company: "",
+    location: "",
+    roles: [createEmptyWorkRole()],
+  };
+}
+
+export function createEmptyEducationEntry() {
+  return {
+    school: "",
+    degree: "",
+    major: "",
+    graduationDate: "",
+    gpa: undefined,
+    location: "",
+  };
+}
+
+export function createEmptyProjectEntry() {
+  return {
+    name: "",
+    description: "",
+    technologies: [],
+    outcomes: [],
+    url: "",
+  };
+}
+
+export function createEmptyCertificationEntry() {
+  return {
+    name: "",
+    issuer: "",
+    issuedDate: "",
+    expiryDate: "",
+  };
+}
+
+export function createEmptyCandidateProfile(overrides: Partial<CandidateProfile> = {}): CandidateProfile {
+  const id = overrides.id ?? "candidate-blank";
+
+  return {
+    id,
+    firstName: overrides.firstName ?? "",
+    lastName: overrides.lastName ?? "",
+    email: overrides.email ?? "",
+    phone: overrides.phone ?? "",
+    city: overrides.city ?? "",
+    state: overrides.state ?? "",
+    country: overrides.country ?? "",
+    linkedInUrl: overrides.linkedInUrl ?? "",
+    githubUrl: overrides.githubUrl ?? "",
+    portfolioUrl: overrides.portfolioUrl ?? "",
+    summary: overrides.summary ?? "",
+    resumeReferenceText: overrides.resumeReferenceText ?? "",
+    remotePreference: overrides.remotePreference ?? "open",
+    willingnessToRelocate: overrides.willingnessToRelocate ?? false,
+    minimumSalary: overrides.minimumSalary ?? 0,
+    preferredSalary: overrides.preferredSalary ?? 0,
+    targetRoles: overrides.targetRoles ?? [],
+    preferredLocations: overrides.preferredLocations ?? [],
+    skills: overrides.skills ?? [],
+    workExperiences: overrides.workExperiences ?? [createEmptyCompanyExperience()],
+    companyExperiences: overrides.companyExperiences ?? [createEmptyCompanyExperience()],
+    education: overrides.education ?? [createEmptyEducationEntry()],
+    projects: overrides.projects ?? [createEmptyProjectEntry()],
+    certifications: overrides.certifications ?? [createEmptyCertificationEntry()],
+    candidateFacts: overrides.candidateFacts ?? [],
+    preferences: overrides.preferences ?? {
+      employmentTypes: [],
+      industriesToPrefer: [],
+      industriesToExclude: [],
+      seniorityPreferences: [],
+      desiredTechnologies: [],
+      locations: [],
+      preferredRemotePolicy: "open",
+      maxCommuteMiles: 0,
+      notes: "",
+    },
+  };
+}
+
 export const ericGrunblattProfile: CandidateProfile = {
   id: "candidate-eric-grunblatt",
   firstName: "Eric",
@@ -13,6 +114,8 @@ export const ericGrunblattProfile: CandidateProfile = {
   githubUrl: "https://github.com/EricGrunblatt",
   summary:
     "Senior software engineer focused on platform engineering, CI/CD, release governance, and observability with experience building enterprise developer tooling and large-scale migration programs.",
+  resumeReferenceText:
+    "Eric Grunblatt\nSkills\nLanguages: Java, Python, JavaScript, TypeScript, SQL, HTML/CSS\nPlatforms & DevOps: Azure DevOps, GitHub Actions, Git, CI/CD\nObservability & Monitoring: Grafana, Prometheus, Grafana Loki, PromQL, LogQL, Splunk\nFrameworks & Databases: Node.js, Express.js, React.js, Vue.js, MySQL, MongoDB\nCloud & Tools: Google Cloud Platform, REST APIs, Linux/Unix\nExperience\nGEICO Tech — Senior Software Engineer\nGEICO Tech — Software Engineer II\nGEICO Tech — Software Engineer I\nRevelwood Solutions — Full Stack JavaScript Intern\nEducation\nStony Brook University\nBachelor of Science: Computer Science",
   remotePreference: "open",
   willingnessToRelocate: false,
   minimumSalary: 180000,

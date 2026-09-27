@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -7,6 +10,20 @@ const navItems = [
 ];
 
 export function AppHeader() {
+  const [user, setUser] = useState<{ firstName: string; lastName: string } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then((response) => response.json())
+      .then((data) => setUser(data.user))
+      .catch(() => setUser(null));
+  }, []);
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    setUser(null);
+  };
+
   return (
     <header className="border-b border-slate-200 bg-white/90 backdrop-blur-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
@@ -34,12 +51,27 @@ export function AppHeader() {
           ))}
         </nav>
 
-        <button
-          type="button"
-          className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
-        >
-          Log in
-        </button>
+        {user ? (
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-slate-700">
+              {user.firstName} {user.lastName}
+            </span>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
+            >
+              Log out
+            </button>
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
+          >
+            Log in
+          </Link>
+        )}
       </div>
     </header>
   );

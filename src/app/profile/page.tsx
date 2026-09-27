@@ -8,6 +8,14 @@ import type {
   RemotePreference,
   WorkRole,
 } from "@/types/candidate";
+import {
+  createEmptyCertificationEntry,
+  createEmptyCompanyExperience,
+  createEmptyEducationEntry,
+  createEmptyExperienceBullet,
+  createEmptyProjectEntry,
+  createEmptyWorkRole,
+} from "@/lib/candidate/profile";
 
 function formatRemotePreference(value?: RemotePreference) {
   switch (value) {
@@ -203,6 +211,104 @@ export default function ProfilePage() {
     });
   };
 
+  const addCompany = () => {
+    if (!profile) return;
+
+    const nextCompanies = [...profile.companyExperiences, createEmptyCompanyExperience()];
+    updateProfile("companyExperiences", nextCompanies);
+    updateProfile("workExperiences", nextCompanies);
+  };
+
+  const removeCompany = (companyIndex: number) => {
+    if (!profile) return;
+
+    const nextCompanies = profile.companyExperiences.filter((_, index) => index !== companyIndex);
+    if (!nextCompanies.length) {
+      nextCompanies.push(createEmptyCompanyExperience());
+    }
+
+    updateProfile("companyExperiences", nextCompanies);
+    updateProfile("workExperiences", nextCompanies);
+  };
+
+  const addRole = (companyIndex: number) => {
+    if (!profile) return;
+
+    const nextCompanies = profile.companyExperiences.map((company, index) => {
+      if (index !== companyIndex) return company;
+      return {
+        ...company,
+        roles: [...company.roles, createEmptyWorkRole()],
+      };
+    });
+
+    updateProfile("companyExperiences", nextCompanies);
+    updateProfile("workExperiences", nextCompanies);
+  };
+
+  const removeRole = (companyIndex: number, roleIndex: number) => {
+    if (!profile) return;
+
+    const nextCompanies = profile.companyExperiences.map((company, index) => {
+      if (index !== companyIndex) return company;
+
+      const nextRoles = company.roles.filter((_, currentIndex) => currentIndex !== roleIndex);
+      return {
+        ...company,
+        roles: nextRoles.length ? nextRoles : [createEmptyWorkRole()],
+      };
+    });
+
+    updateProfile("companyExperiences", nextCompanies);
+    updateProfile("workExperiences", nextCompanies);
+  };
+
+  const addBullet = (companyIndex: number, roleIndex: number) => {
+    if (!profile) return;
+
+    const nextCompanies = profile.companyExperiences.map((company, index) => {
+      if (index !== companyIndex) return company;
+
+      return {
+        ...company,
+        roles: company.roles.map((role, currentRoleIndex) => {
+          if (currentRoleIndex !== roleIndex) return role;
+          return {
+            ...role,
+            bullets: [...role.bullets, createEmptyExperienceBullet()],
+          };
+        }),
+      };
+    });
+
+    updateProfile("companyExperiences", nextCompanies);
+    updateProfile("workExperiences", nextCompanies);
+  };
+
+  const removeBullet = (companyIndex: number, roleIndex: number, bulletIndex: number) => {
+    if (!profile) return;
+
+    const nextCompanies = profile.companyExperiences.map((company, index) => {
+      if (index !== companyIndex) return company;
+
+      return {
+        ...company,
+        roles: company.roles.map((role, currentRoleIndex) => {
+          if (currentRoleIndex !== roleIndex) return role;
+
+          const nextBullets = role.bullets.filter((_, currentBulletIndex) => currentBulletIndex !== bulletIndex);
+          return {
+            ...role,
+            bullets: nextBullets.length ? nextBullets : [createEmptyExperienceBullet()],
+          };
+        }),
+      };
+    });
+
+    updateProfile("companyExperiences", nextCompanies);
+    updateProfile("workExperiences", nextCompanies);
+  };
+
   const updateBullet = (
     companyIndex: number,
     roleIndex: number,
@@ -236,6 +342,39 @@ export default function ProfilePage() {
         workExperiences: nextCompanies,
       };
     });
+  };
+
+  const addEducation = () => {
+    if (!profile) return;
+    updateProfile("education", [...profile.education, createEmptyEducationEntry()]);
+  };
+
+  const removeEducation = (index: number) => {
+    if (!profile) return;
+    const nextEducation = profile.education.filter((_, currentIndex) => currentIndex !== index);
+    updateProfile("education", nextEducation.length ? nextEducation : [createEmptyEducationEntry()]);
+  };
+
+  const addProject = () => {
+    if (!profile) return;
+    updateProfile("projects", [...profile.projects, createEmptyProjectEntry()]);
+  };
+
+  const removeProject = (index: number) => {
+    if (!profile) return;
+    const nextProjects = profile.projects.filter((_, currentIndex) => currentIndex !== index);
+    updateProfile("projects", nextProjects.length ? nextProjects : [createEmptyProjectEntry()]);
+  };
+
+  const addCertification = () => {
+    if (!profile) return;
+    updateProfile("certifications", [...profile.certifications, createEmptyCertificationEntry()]);
+  };
+
+  const removeCertification = (index: number) => {
+    if (!profile) return;
+    const nextCertifications = profile.certifications.filter((_, currentIndex) => currentIndex !== index);
+    updateProfile("certifications", nextCertifications.length ? nextCertifications : [createEmptyCertificationEntry()]);
   };
 
   return (
@@ -284,6 +423,16 @@ export default function ProfilePage() {
                     className="editor-textarea"
                     value={profile.summary ?? ""}
                     onChange={(event) => updateProfile("summary", event.target.value)}
+                  />
+                </div>
+
+                <div className="profile-card">
+                  <h2>Resume reference</h2>
+                  <textarea
+                    className="editor-textarea"
+                    value={profile.resumeReferenceText ?? ""}
+                    onChange={(event) => updateProfile("resumeReferenceText", event.target.value)}
+                    placeholder="Paste your existing resume or a format reference here. The app will use this as the template baseline for tailored resumes."
                   />
                 </div>
 
@@ -366,7 +515,10 @@ export default function ProfilePage() {
               </section>
 
               <section style={{ marginBottom: "24px" }}>
-                <h2 style={{ margin: "0 0 16px", fontSize: "1.3rem", fontWeight: 800 }}>Experience</h2>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+                  <h2 style={{ margin: 0, fontSize: "1.3rem", fontWeight: 800 }}>Experience</h2>
+                  <button type="button" className="inline-action-button" onClick={addCompany}>+ Add company</button>
+                </div>
                 <div className="experience-stack">
                   {profile.companyExperiences.map((company, companyIndex) => (
                     <div key={`${company.company}-${companyIndex}`} className="company-card">
@@ -391,7 +543,10 @@ export default function ProfilePage() {
                             />
                           </label>
                         </div>
-                        <span className="company-date-range">{getCompanyDateRange(company)}</span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <span className="company-date-range">{getCompanyDateRange(company)}</span>
+                          <button type="button" className="inline-action-button small" onClick={() => removeCompany(companyIndex)}>Remove</button>
+                        </div>
                       </div>
 
                       <div className="role-stack">
@@ -482,8 +637,17 @@ export default function ProfilePage() {
                                       }
                                     />
                                   </label>
+                                  <div className="stack-actions">
+                                    <button type="button" className="inline-action-button small" onClick={() => addBullet(companyIndex, roleIndex)}>+ Add achievement</button>
+                                    <button type="button" className="inline-action-button small danger" onClick={() => removeBullet(companyIndex, roleIndex, bulletIndex)}>Remove achievement</button>
+                                  </div>
                                 </div>
                               ))}
+                            </div>
+
+                            <div className="stack-actions" style={{ marginTop: "16px" }}>
+                              <button type="button" className="inline-action-button small" onClick={() => addRole(companyIndex)}>+ Add role</button>
+                              <button type="button" className="inline-action-button small danger" onClick={() => removeRole(companyIndex, roleIndex)}>Remove role</button>
                             </div>
                           </div>
                         ))}
@@ -494,10 +658,16 @@ export default function ProfilePage() {
               </section>
 
               <section className="profile-card">
-                <h2>Education</h2>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+                  <h2 style={{ margin: 0 }}>Education</h2>
+                  <button type="button" className="inline-action-button" onClick={addEducation}>+ Add education</button>
+                </div>
                 <div className="education-stack edit-education-list">
                   {profile.education.map((edu, index) => (
                     <div key={`${edu.school}-${index}`} className="education-item">
+                      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                        <button type="button" className="inline-action-button small danger" onClick={() => removeEducation(index)}>Remove</button>
+                      </div>
                       <label className="editor-field">
                         <span>School</span>
                         <input
@@ -528,6 +698,93 @@ export default function ProfilePage() {
                             const nextEducation = [...profile.education];
                             nextEducation[index] = { ...edu, major: event.target.value };
                             updateProfile("education", nextEducation);
+                          }}
+                        />
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="profile-card">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+                  <h2 style={{ margin: 0 }}>Projects</h2>
+                  <button type="button" className="inline-action-button" onClick={addProject}>+ Add project</button>
+                </div>
+                <div className="education-stack edit-education-list">
+                  {profile.projects.map((project, index) => (
+                    <div key={`${project.name || "project"}-${index}`} className="education-item">
+                      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                        <button type="button" className="inline-action-button small danger" onClick={() => removeProject(index)}>Remove</button>
+                      </div>
+                      <label className="editor-field">
+                        <span>Name</span>
+                        <input
+                          value={project.name}
+                          onChange={(event) => {
+                            const nextProjects = [...profile.projects];
+                            nextProjects[index] = { ...project, name: event.target.value };
+                            updateProfile("projects", nextProjects);
+                          }}
+                        />
+                      </label>
+                      <label className="editor-field">
+                        <span>Description</span>
+                        <textarea
+                          value={project.description ?? ""}
+                          onChange={(event) => {
+                            const nextProjects = [...profile.projects];
+                            nextProjects[index] = { ...project, description: event.target.value };
+                            updateProfile("projects", nextProjects);
+                          }}
+                        />
+                      </label>
+                      <label className="editor-field">
+                        <span>Technologies</span>
+                        <input
+                          value={(project.technologies ?? []).join(", ")}
+                          onChange={(event) => {
+                            const nextProjects = [...profile.projects];
+                            nextProjects[index] = { ...project, technologies: parseList(event.target.value) };
+                            updateProfile("projects", nextProjects);
+                          }}
+                        />
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="profile-card">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+                  <h2 style={{ margin: 0 }}>Certifications</h2>
+                  <button type="button" className="inline-action-button" onClick={addCertification}>+ Add certification</button>
+                </div>
+                <div className="education-stack edit-education-list">
+                  {profile.certifications.map((certification, index) => (
+                    <div key={`${certification.name || "cert"}-${index}`} className="education-item">
+                      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                        <button type="button" className="inline-action-button small danger" onClick={() => removeCertification(index)}>Remove</button>
+                      </div>
+                      <label className="editor-field">
+                        <span>Name</span>
+                        <input
+                          value={certification.name}
+                          onChange={(event) => {
+                            const nextCertifications = [...profile.certifications];
+                            nextCertifications[index] = { ...certification, name: event.target.value };
+                            updateProfile("certifications", nextCertifications);
+                          }}
+                        />
+                      </label>
+                      <label className="editor-field">
+                        <span>Issuer</span>
+                        <input
+                          value={certification.issuer ?? ""}
+                          onChange={(event) => {
+                            const nextCertifications = [...profile.certifications];
+                            nextCertifications[index] = { ...certification, issuer: event.target.value };
+                            updateProfile("certifications", nextCertifications);
                           }}
                         />
                       </label>

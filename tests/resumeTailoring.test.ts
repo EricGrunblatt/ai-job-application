@@ -15,6 +15,8 @@ test("tailorResumeForJob selects relevant verified facts and validates them", ()
   assert.ok(result.skills.length > 0);
   assert.ok(result.experience.length > 0);
   assert.ok(result.experience.every((entry) => entry.bullets.length > 0));
+  assert.ok(result.professionalSummary.toLowerCase().includes("ci/cd") || result.professionalSummary.toLowerCase().includes("platform"));
+  assert.ok(result.skills.some((skill) => skill.toLowerCase().includes("ci/cd") || skill.toLowerCase().includes("terraform") || skill.toLowerCase().includes("kubernetes")));
 
   const validation = validateTailoredResume(result, ericGrunblattProfile);
   assert.equal(validation.valid, true);

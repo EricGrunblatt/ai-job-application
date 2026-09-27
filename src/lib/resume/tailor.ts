@@ -29,6 +29,10 @@ function normalizeSkill(skill: string) {
   return skill.trim().toLowerCase();
 }
 
+function normalizeText(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+}
+
 function skillMatches(profile: CandidateProfile, job: Job) {
   const profileSkillNames = new Set(profile.skills.map((skill) => normalizeSkill(skill.name)));
   const relevantSkills = [...new Set([...job.requiredSkills, ...job.preferredSkills].map((skill) => normalizeSkill(skill)))];
@@ -41,32 +45,60 @@ function pickRelevantFacts(profile: CandidateProfile, job: Job): CandidateFact[]
 
   return profile.candidateFacts
     .filter((fact) => fact.verified)
-    .filter((fact) => {
-      const factSkills = fact.skills.map((skill) => normalizeSkill(skill));
-      return factSkills.some((skill) => matchedSkillNames.has(skill));
+    .map((fact) => {
+      const factText = normalizeText(`${fact.text} ${fact.skills.join(" ")}`);
+      const factSkillMatches = fact.skills
+        .map((skill) => normalizeSkill(skill))
+        .filter((skill) => matchedSkillNames.has(skill)).length;
+      const jobWordMatches = [...(job.requiredSkills ?? []), ...(job.preferredSkills ?? [])]
+        .map((skill) => skill.toLowerCase())
+        .filter((skill) => factText.includes(skill.toLowerCase())).length;
+
+      return { fact, score: factSkillMatches + jobWordMatches };
     })
-    .slice(0, 6);
+    .filter(({ fact, score }) => fact.skills.some((skill) => matchedSkillNames.has(normalizeSkill(skill))) || score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 6)
+    .map(({ fact }) => fact);
 }
 
 function buildProfessionalSummary(profile: CandidateProfile, job: Job) {
   const relevant = skillMatches(profile, job);
   const highlight = relevant.slice(0, 4).join(", ") || "platform engineering and developer enablement";
+  const jobKeywords = [...(job.requiredSkills ?? []), ...(job.preferredSkills ?? [])]
+    .filter((keyword) => keyword && relevant.some((skill) => normalizeSkill(skill) === normalizeSkill(keyword)))
+    .slice(0, 4);
+  const keywordPhrase = jobKeywords.length ? jobKeywords.join(", ") : highlight;
 
-  return `Software engineer with experience building ${highlight} systems, improving release governance, and enabling teams to ship faster with more reliable delivery workflows.`;
+  return `Software engineer with hands-on experience in ${keywordPhrase}, release governance, and developer platform optimization. Experienced in ${job.title}, CI/CD workflows, deployment automation, and platform reliability across high-scale engineering environments.`;
 }
 
-function experienceFromFacts(facts: CandidateFact[]) {
+function prioritizeKeywordText(text: string, job: Job) {
+  const keywordTerms = [...(job.requiredSkills ?? []), ...(job.preferredSkills ?? [])]
+    .map((keyword) => keyword.trim())
+    .filter((keyword) => keyword && text.toLowerCase().includes(keyword.toLowerCase()));
+
+  if (!keywordTerms.length) {
+    return text;
+  }
+
+  const topKeywords = keywordTerms.slice(0, 3).join(", ");
+  return `${topKeywords}: ${text}`;
+}
+
+function experienceFromFacts(facts: CandidateFact[], job: Job) {
   if (!facts.length) {
     return [];
   }
 
   return facts.reduce<Array<TailoredResumeExperience>>((acc, fact) => {
     const existing = acc.find((entry) => entry.company === fact.company && entry.role === fact.role);
+    const optimizedText = prioritizeKeywordText(fact.text, job);
 
     if (existing) {
       existing.bullets.push({
         sourceFactIds: [fact.id],
-        text: fact.text,
+        text: optimizedText,
         metrics: fact.metrics,
       });
       return acc;
@@ -78,7 +110,7 @@ function experienceFromFacts(facts: CandidateFact[]) {
       dates: "Recent role",
       bullets: [{
         sourceFactIds: [fact.id],
-        text: fact.text,
+        text: optimizedText,
         metrics: fact.metrics,
       }],
     });
@@ -95,11 +127,17 @@ export function tailorResumeForJob({
 }): TailoredResume {
   const matchedSkills = skillMatches(profile, job);
   const facts = pickRelevantFacts(profile, job);
+  const jobSkillPriority = [...(job.requiredSkills ?? []), ...(job.preferredSkills ?? [])];
+  const sortedSkills = [...new Set(matchedSkills.map((skill) => skill.charAt(0).toUpperCase() + skill.slice(1)))].sort((a, b) => {
+    const aWeight = jobSkillPriority.findIndex((skill) => normalizeSkill(skill) === normalizeSkill(a));
+    const bWeight = jobSkillPriority.findIndex((skill) => normalizeSkill(skill) === normalizeSkill(b));
+    return (aWeight === -1 ? Number.MAX_SAFE_INTEGER : aWeight) - (bWeight === -1 ? Number.MAX_SAFE_INTEGER : bWeight);
+  });
 
   return {
     professionalSummary: buildProfessionalSummary(profile, job),
-    skills: matchedSkills.length ? matchedSkills : profile.skills.map((skill) => skill.name).slice(0, 12),
-    experience: experienceFromFacts(facts),
+    skills: sortedSkills.length ? sortedSkills : profile.skills.map((skill) => skill.name).slice(0, 12),
+    experience: experienceFromFacts(facts, job),
   };
 }
 

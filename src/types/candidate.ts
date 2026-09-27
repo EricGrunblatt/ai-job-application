@@ -85,6 +85,7 @@ export interface CandidateProfile {
   githubUrl?: string;
   portfolioUrl?: string;
   summary?: string;
+  resumeReferenceText?: string;
   remotePreference?: RemotePreference;
   willingnessToRelocate?: boolean;
   minimumSalary?: number;
