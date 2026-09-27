@@ -39,14 +39,20 @@ function JobReviewPage() {
         setResumeDraft(tailoredPayload.resume);
       }
 
+      const coverLetterResponse = await fetch("/api/resume/cover-letter", { method: "POST" });
+      const coverLetterPayload = (await coverLetterResponse.json()) as { letter?: string };
+      if (coverLetterPayload.letter) {
+        setCoverLetter(coverLetterPayload.letter);
+      }
+
       const response = await fetch("/api/resume/generate", { method: "POST" });
       const payload = (await response.json()) as { url?: string };
       setResumeUrl(payload.url ?? "/generated/resume.pdf");
     } catch {
       setResumeUrl("/generated/resume.pdf");
+      setCoverLetter(buildCoverLetter(job));
     }
 
-    setCoverLetter(buildCoverLetter(job));
     setResumeLoading(false);
   };
 
