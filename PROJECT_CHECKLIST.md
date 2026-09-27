@@ -50,6 +50,8 @@ Use this file as the source of truth for current progress. Update it as work is 
 - [ ] Resume validation
 - [ ] Deterministic resume rendering
 
+Status: In progress — local PDF preview generation and resume drafting pipeline are being implemented for test review.
+
 ### Milestone 6 — Cover Letter
 - [ ] Cover letter prompt
 - [ ] Structured output
