@@ -7,6 +7,7 @@ const navItems = [
   { href: "/", label: "Home" },
   { href: "/jobs", label: "Jobs" },
   { href: "/profile", label: "Profile" },
+  { href: "/applications", label: "Dashboard" },
 ];
 
 export function AppHeader() {

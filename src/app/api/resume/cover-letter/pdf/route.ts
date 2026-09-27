@@ -2,34 +2,26 @@ import { NextResponse } from "next/server";
 
 import { ericGrunblattProfile } from "@/lib/candidate/profile";
 import { sampleJob } from "@/lib/jobs/sample";
-import { generateResumePdfPreview } from "@/lib/resume/pdf";
+import { generateCoverLetterPdfPreview } from "@/lib/resume/pdf";
 
 export async function POST(request: Request) {
   try {
     const body = (await request.json().catch(() => ({}))) as {
       profile?: typeof ericGrunblattProfile;
       job?: typeof sampleJob;
+      coverLetterText?: string;
       fileName?: string;
-      resumeDraft?: {
-        professionalSummary: string;
-        skills: string[];
-        experience: Array<{
-          company: string;
-          role: string;
-          dates: string;
-          bullets: Array<{ text: string; sourceFactIds?: string[] }>;
-        }>;
-      };
     };
 
     const profile = body.profile ?? ericGrunblattProfile;
     const job = body.job ?? sampleJob;
+    const coverLetterText = body.coverLetterText ?? "";
 
-    const result = await generateResumePdfPreview({
+    const result = await generateCoverLetterPdfPreview({
       profile,
       job,
+      coverLetterText,
       fileName: body.fileName,
-      resumeDraft: body.resumeDraft,
     });
 
     return NextResponse.json({
@@ -37,11 +29,11 @@ export async function POST(request: Request) {
       ...result,
     });
   } catch (error) {
-    console.error("Resume PDF generation failed", error);
+    console.error("Cover letter PDF generation failed", error);
     return NextResponse.json(
       {
         ok: false,
-        error: "Resume PDF could not be generated.",
+        error: "Cover letter PDF could not be generated.",
       },
       { status: 500 },
     );
@@ -49,9 +41,10 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  const result = await generateResumePdfPreview({
+  const result = await generateCoverLetterPdfPreview({
     profile: ericGrunblattProfile,
     job: sampleJob,
+    coverLetterText: "This is a sample cover letter preview.",
   });
 
   return NextResponse.json({

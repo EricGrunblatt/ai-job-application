@@ -21,6 +21,17 @@ export type ResumePdfResult = {
   url: string;
 };
 
+export type ResumeDraft = {
+  professionalSummary: string;
+  skills: string[];
+  experience: Array<{
+    company: string;
+    role: string;
+    dates: string;
+    bullets: Array<{ text: string; sourceFactIds?: string[] }>;
+  }>;
+};
+
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -145,13 +156,37 @@ export async function generateResumePdfPreview({
   job,
   outputDir = join(process.cwd(), "public", "generated"),
   fileName,
-}: ResumePdfInput): Promise<ResumePdfResult> {
+  resumeDraft,
+}: ResumePdfInput & { resumeDraft?: ResumeDraft }): Promise<ResumePdfResult> {
   await mkdir(outputDir, { recursive: true });
 
   const resolvedFileName = fileName || `${slugify(job.company)}-${slugify(job.title)}.pdf`;
   const filePath = join(outputDir, resolvedFileName);
 
-  const sections = buildResumeSections(profile, job);
+  const sections = resumeDraft ? {
+    name: `${profile.firstName} ${profile.lastName}`,
+    contactLine: [profile.phone, profile.city && profile.state ? `${profile.city}, ${profile.state}` : profile.city ?? profile.state, profile.email, profile.linkedInUrl, profile.githubUrl].filter(Boolean).join(" ▪ "),
+    skills: resumeDraft.skills.map((skill) => ({ category: "Selected Skills", names: [skill] })),
+    experience: resumeDraft.experience.map((entry) => ({
+      company: entry.company,
+      title: entry.role,
+      location: "",
+      dateRange: entry.dates,
+      bullets: entry.bullets.map((bullet) => bullet.text),
+      teamName: "",
+    })),
+    education: profile.education.map((entry) => ({
+      school: entry.school,
+      location: entry.location,
+      degree: entry.degree,
+      major: entry.major,
+      graduationDate: entry.graduationDate,
+      gpa: entry.gpa,
+    })),
+    referenceTemplate: profile.resumeReferenceText,
+    targetJob: job.title,
+    targetCompany: job.company,
+  } : buildResumeSections(profile, job);
   const doc = new PDFDocument({ size: "LETTER", margin: 48 });
 
   await new Promise<void>((resolve, reject) => {
@@ -219,6 +254,54 @@ export async function generateResumePdfPreview({
       });
     }
 
+    doc.end();
+  });
+
+  return {
+    format: "pdf",
+    fileName: resolvedFileName,
+    filePath,
+    url: `/generated/${resolvedFileName}`,
+  };
+}
+
+export async function generateCoverLetterPdfPreview({
+  profile,
+  job,
+  coverLetterText,
+  outputDir = join(process.cwd(), "public", "generated"),
+  fileName,
+}: {
+  profile: CandidateProfile;
+  job: Job;
+  coverLetterText: string;
+  outputDir?: string;
+  fileName?: string;
+}): Promise<ResumePdfResult> {
+  await mkdir(outputDir, { recursive: true });
+
+  const resolvedFileName = fileName || `${slugify(job.company)}-${slugify(job.title)}-cover-letter.pdf`;
+  const filePath = join(outputDir, resolvedFileName);
+
+  const doc = new PDFDocument({ size: "LETTER", margin: 54 });
+
+  await new Promise<void>((resolve, reject) => {
+    const stream = createWriteStream(filePath);
+
+    stream.on("finish", () => resolve());
+    stream.on("error", reject);
+
+    doc.pipe(stream);
+    doc.font("Helvetica-Bold").fontSize(16).text(`${profile.firstName} ${profile.lastName}`);
+    doc.font("Helvetica").fontSize(10).text([profile.email, profile.phone, profile.city && profile.state ? `${profile.city}, ${profile.state}` : profile.city, profile.linkedInUrl].filter(Boolean).join(" | "));
+    doc.moveDown(1);
+    doc.font("Helvetica-Bold").fontSize(12).text(`Application for ${job.title}`);
+    doc.moveDown(0.5);
+    doc.font("Helvetica").fontSize(10).text(coverLetterText, {
+      align: "left",
+      lineGap: 4,
+      width: 490,
+    });
     doc.end();
   });
 

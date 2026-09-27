@@ -236,13 +236,13 @@ function JobReviewPage() {
               </div>
 
               {isReviewing && (
-                <button
-                  type="button"
+                <Link
+                  href="/applications"
                   onClick={() => setIsApproved(true)}
-                  className="mt-3 w-full rounded-full bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
+                  className="mt-3 block w-full rounded-full bg-emerald-600 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-emerald-700"
                 >
-                  {isApproved ? "Approved for review" : "Approve application package"}
-                </button>
+                  {isApproved ? "Approved for review" : "Review application package"}
+                </Link>
               )}
             </div>
           </aside>
