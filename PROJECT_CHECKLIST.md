@@ -35,12 +35,12 @@ Use this file as the source of truth for current progress. Update it as work is 
 - [x] Basic job detail page
 
 ### Milestone 4 — Job Description Analyzer
-- [ ] OpenAI client
-- [ ] Prompt
-- [ ] Zod schema
-- [ ] Analyzer service
-- [ ] /api/jobs/analyze
-- [ ] Job analysis UI
+- [x] OpenAI client
+- [x] Prompt
+- [x] Zod schema
+- [x] Analyzer service
+- [x] /api/jobs/analyze
+- [x] Job analysis UI
 
 ### Milestone 5 — Resume Tailoring
 - [ ] Candidate/job matching
