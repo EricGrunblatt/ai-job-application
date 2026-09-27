@@ -34,6 +34,7 @@ Use this file as the source of truth for current progress. Update it as work is 
 ### Milestone 2A — Account Access
 - [x] Local auth flow with email/username sign up and sign in
 - [x] Session cookie-based login state
+- [x] Resume text import and profile autofill from an existing resume
 - [ ] OAuth providers (Google/LinkedIn) pending for production rollout
 
 ### Milestone 3 — Job Model
@@ -58,7 +59,7 @@ Use this file as the source of truth for current progress. Update it as work is 
 - [x] Deterministic resume rendering
 - [x] Resume reference and template baseline integration
 
-Status: In progress — auth is working locally and the profile editor supports multiple entries; OAuth remains the next external integration once the core flow is stable.
+Status: In progress — the candidate profile and resume-import flow are working, and the next phase is cover-letter generation plus review flow; OAuth remains a later external integration once the core application pipeline is stable.
 
 ### Milestone 6 — Cover Letter
 - [ ] Cover letter prompt

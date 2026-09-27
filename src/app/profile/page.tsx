@@ -16,6 +16,7 @@ import {
   createEmptyProjectEntry,
   createEmptyWorkRole,
 } from "@/lib/candidate/profile";
+import { parseResumeTextToProfile } from "@/lib/candidate/resumeImport";
 
 function formatRemotePreference(value?: RemotePreference) {
   switch (value) {
@@ -427,7 +428,19 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="profile-card">
-                  <h2>Resume reference</h2>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", marginBottom: "12px" }}>
+                    <h2 style={{ margin: 0 }}>Resume reference</h2>
+                    <button
+                      type="button"
+                      className="inline-action-button small"
+                      onClick={() => {
+                        const nextProfile = parseResumeTextToProfile(profile.resumeReferenceText ?? "", profile);
+                        setProfile((current) => (current ? { ...current, ...nextProfile } : current));
+                      }}
+                    >
+                      Import profile from text
+                    </button>
+                  </div>
                   <textarea
                     className="editor-textarea"
                     value={profile.resumeReferenceText ?? ""}
