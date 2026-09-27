@@ -8,6 +8,7 @@ import type { Job } from "@/types/job";
 import { ericGrunblattProfile } from "@/lib/candidate/profile";
 import { matchJobToProfile, salaryRangeOverlaps } from "@/lib/jobs/matching";
 import { sampleJob } from "@/lib/jobs/sample";
+import { searchJobs } from "@/lib/jobs/search";
 
 const salaryFloor = 50000;
 const salaryCeiling = 250000;
@@ -129,6 +130,21 @@ export default function JobsPage() {
     [],
   );
 
+  const searchResults = useMemo(
+    () =>
+      searchJobs(
+        {
+          roles: currentCriteria.roles,
+          locations: currentCriteria.locations,
+          minimumBaseSalary: Number(criteria.salary || 0),
+          remotePolicy: criteria.remote.toLowerCase() === "remote" ? "remote" : criteria.remote.toLowerCase() === "hybrid" ? "hybrid" : criteria.remote.toLowerCase() === "onsite" ? "onsite" : "unknown",
+          preferredSkills: ["CI/CD", "Observability", "Platform Engineering", "Terraform"],
+        },
+        jobQueue,
+      ),
+    [currentCriteria.locations, currentCriteria.roles, criteria.remote, criteria.salary],
+  );
+
   const filteredJobs = useMemo(() => {
     const normalized = evaluatedJobs.filter(({ job }) => {
       const publishedDate = job.publishedAt ? new Date(job.publishedAt) : new Date(0);
@@ -198,6 +214,11 @@ export default function JobsPage() {
 
   const selectedCount = selectedIds.length;
 
+  const matchedSearchResults = searchResults.map((job) => ({
+    job,
+    match: matchJobToProfile(ericGrunblattProfile, job),
+  }));
+
   return (
     <main className="min-h-screen bg-slate-100 px-6 py-12 text-slate-900">
       <div className="mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
@@ -217,6 +238,60 @@ export default function JobsPage() {
             <div>Batch actions ready</div>
           </div>
         </div>
+
+        <section className="mb-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold">Search results</h2>
+            <span className="text-sm text-slate-600">{matchedSearchResults.length} jobs found</span>
+          </div>
+
+          {matchedSearchResults.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-slate-300 bg-white p-4 text-sm text-slate-600">
+              No jobs matched your current search criteria.
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {matchedSearchResults.slice(0, 6).map(({ job, match }) => (
+                <div key={job.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{job.company}</div>
+                      <h3 className="mt-2 text-lg font-semibold text-slate-900">{job.title}</h3>
+                    </div>
+                    <span className="rounded-full bg-sky-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-700">
+                      {match.skillMatchScore}%
+                    </span>
+                  </div>
+
+                  <div className="mt-3 space-y-2 text-sm text-slate-700">
+                    <p>{job.location.join(", ")}</p>
+                    <p>{job.remotePolicy}</p>
+                    <p>
+                      {job.salary?.min && job.salary?.max
+                        ? `$${job.salary.min.toLocaleString()} - $${job.salary.max.toLocaleString()}`
+                        : "Salary not disclosed"}
+                    </p>
+                  </div>
+
+                  <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+                    {match.reasons.slice(0, 2).map((reason) => (
+                      <p key={reason} className="mb-1 last:mb-0">• {reason}</p>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 flex gap-2">
+                    <Link href={`/jobs/${job.id}`} className="rounded-full bg-sky-600 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white hover:bg-sky-700">
+                      View job
+                    </Link>
+                    <button type="button" onClick={() => toggleSelect(job.id)} className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-700 hover:bg-slate-100">
+                      {selectedIds.includes(job.id) ? "Selected" : "Select"}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
 
         <section className="mb-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
           <div className="mb-4 flex items-center justify-between gap-4">

@@ -62,25 +62,25 @@ Use this file as the source of truth for current progress. Update it as work is 
 Status: In progress — the candidate profile and resume-import flow are working, and the next phase is cover-letter generation plus review flow; OAuth remains a later external integration once the core application pipeline is stable.
 
 ### Milestone 6 — Cover Letter
-- [ ] Cover letter prompt
-- [ ] Structured output
-- [ ] Validation
-- [ ] Rendering
-- [ ] Review UI
+- [x] Cover letter prompt
+- [x] Structured output
+- [x] Validation
+- [x] Rendering
+- [x] Review UI
 
 ### Milestone 7 — Application Questions
-- [ ] Question extraction
-- [ ] Question classification
-- [ ] Answer generation
-- [ ] Confidence classification
-- [ ] Human review flags
+- [x] Question extraction
+- [x] Question classification
+- [x] Answer generation
+- [x] Confidence classification
+- [x] Human review flags
 
 ### Milestone 8 — Application Review
-- [ ] Review dashboard
-- [ ] Resume preview/download
-- [ ] Cover letter preview/edit
-- [ ] Question review/edit flow
-- [ ] Explicit approval gate
+- [x] Review dashboard
+- [x] Resume preview/download
+- [x] Cover letter preview/edit
+- [x] Question review/edit flow
+- [x] Explicit approval gate
 
 ### Milestone 9 — Browser Automation
 - [ ] Playwright service
@@ -93,26 +93,28 @@ Status: In progress — the candidate profile and resume-import flow are working
 - [ ] Human handoff
 
 ### Milestone 10 — Job Sources
-- [ ] JobSource abstraction
-- [ ] First supported job source
-- [ ] Normalization
+- [x] JobSource abstraction
+- [x] First supported job source
+- [x] Normalization
 - [ ] Deduplication
-- [ ] Search UI
+- [x] Search UI
 
 ### Milestone 11 — Job Matching
-- [ ] Candidate/job matching
-- [ ] Transparent match reasons
-- [ ] Gaps
-- [ ] Search result filtering/sorting
+- [x] Candidate/job matching
+- [x] Transparent match reasons
+- [x] Gaps
+- [x] Search result filtering/sorting
 
 ### Milestone 12 — Application History
-- [ ] Application records
-- [ ] Statuses
-- [ ] Resume/cover-letter version references
-- [ ] Notes
+- [x] Application records
+- [x] Statuses
+- [x] Resume/cover-letter version references
+- [x] Notes
 - [ ] Search/filter history
 
 ## Notes
-- The project is currently in the profile and job-model phase of development.
+- The project is currently in the job-discovery and automation-prep phase of development.
+- The review flow, cover-letter path, application history, and job-discovery matching are all working and validated.
+- Browser automation and deeper ATS integrations remain intentionally deferred until the human-in-the-loop review and approval flow is stable.
 - This checklist should be treated as the active status tracker for all agents.
 - Update it whenever work is started, completed, or changed in scope.

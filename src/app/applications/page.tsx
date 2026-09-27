@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { generateCoverLetter } from "@/lib/ai/services/coverLetter";
 import { ericGrunblattProfile } from "@/lib/candidate/profile";
+import { answerApplicationQuestion, generateApplicationQuestions } from "@/lib/applications/questions";
 import { matchJobToProfile } from "@/lib/jobs/matching";
 import { sampleJob } from "@/lib/jobs/sample";
 import { tailorResumeForJob } from "@/lib/resume/tailor";
@@ -22,29 +23,22 @@ const initialCoverLetter = generateCoverLetter({
   job,
 });
 
-const sampleQuestions = [
-  {
-    question: "Describe your experience with CI/CD and release governance.",
-    answer:
-      "I have built reusable CI/CD workflows, release governance controls, and deployment automation across Azure DevOps and GitHub, with a focus on platform safety and developer enablement.",
-    confidence: "High confidence",
-    requiresReview: false,
-  },
-  {
-    question: "How many years of Kubernetes experience do you have?",
-    answer: null,
-    confidence: "Low confidence",
-    requiresReview: true,
-    reason: "No verified Kubernetes experience is currently stored in the profile.",
-  },
-  {
-    question: "What observability tooling are you strongest in?",
-    answer:
-      "My strongest experience is in Grafana Loki, Prometheus, and LogQL-based observability delivery, including large-scale migration work from Splunk.",
-    confidence: "High confidence",
-    requiresReview: false,
-  },
-];
+const generatedQuestions = generateApplicationQuestions({
+  profile: ericGrunblattProfile,
+  job,
+}).map((item) => {
+  const answer = answerApplicationQuestion({
+    question: item.question,
+    profile: ericGrunblattProfile,
+    job,
+  });
+
+  return {
+    ...item,
+    answer: answer.answer,
+    reason: answer.reason,
+  };
+});
 
 export default function ApplicationsDashboardPage() {
   const [resume, setResume] = useState(initialResume);
@@ -53,8 +47,34 @@ export default function ApplicationsDashboardPage() {
   const [resumePdfUrl, setResumePdfUrl] = useState<string | null>(null);
   const [coverLetterPdfUrl, setCoverLetterPdfUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [applicationRecordId, setApplicationRecordId] = useState<string | null>(null);
 
   const match = useMemo(() => matchJobToProfile(ericGrunblattProfile, job), []);
+
+  const handleSubmitReview = async () => {
+    try {
+      const response = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          job,
+          resumeText: resume.professionalSummary,
+          coverLetterText: coverLetter,
+          resumePdfUrl: resumePdfUrl ?? undefined,
+          coverLetterPdfUrl: coverLetterPdfUrl ?? undefined,
+          status: "READY_FOR_REVIEW",
+          approved: approved,
+        }),
+      });
+
+      const payload = (await response.json()) as { ok?: boolean; application?: { id?: string } };
+      if (payload.application?.id) {
+        setApplicationRecordId(payload.application.id);
+      }
+    } catch (error) {
+      console.error("Application record save failed", error);
+    }
+  };
 
   const handleGenerateFinalPreview = async () => {
     setIsGenerating(true);
@@ -127,7 +147,10 @@ export default function ApplicationsDashboardPage() {
               </Link>
               <button
                 type="button"
-                onClick={() => setApproved((current) => !current)}
+                onClick={() => {
+                  setApproved((current) => !current);
+                  void handleSubmitReview();
+                }}
                 className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
               >
                 {approved ? "Approved" : "Approve package"}
@@ -135,7 +158,7 @@ export default function ApplicationsDashboardPage() {
             </div>
           </div>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-5">
+          <div className="mt-6 grid gap-4 md:grid-cols-6">
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Salary</div>
               <div className="mt-2 text-lg font-semibold">
@@ -168,6 +191,13 @@ export default function ApplicationsDashboardPage() {
             >
               {isGenerating ? "Generating…" : "Generate final PDFs"}
             </button>
+
+            <Link
+              href="/applications/history"
+              className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-100"
+            >
+              View history
+            </Link>
           </div>
         </div>
 
@@ -190,6 +220,12 @@ export default function ApplicationsDashboardPage() {
                   <a href={resumePdfUrl} target="_blank" rel="noreferrer" className="text-sm font-medium text-sky-700 hover:text-sky-800">
                     Open final resume PDF
                   </a>
+                </div>
+              ) : null}
+
+              {applicationRecordId ? (
+                <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+                  Review saved as application #{applicationRecordId.slice(0, 8)}
                 </div>
               ) : null}
 
@@ -255,7 +291,7 @@ export default function ApplicationsDashboardPage() {
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="text-xl font-semibold">Application questions</h2>
               <div className="mt-4 space-y-4">
-                {sampleQuestions.map((item) => (
+                {generatedQuestions.map((item) => (
                   <div key={item.question} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                     <div className="flex items-center justify-between gap-3">
                       <p className="font-medium text-slate-800">{item.question}</p>

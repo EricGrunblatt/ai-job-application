@@ -37,6 +37,28 @@ model Candidate {
   preferences           CandidatePreference?
 }
 
+model Application {
+  id                   String    @id @default(cuid())
+  status               String    @default("READY_FOR_REVIEW")
+  company              String
+  jobTitle             String
+  jobUrl               String?
+  location             String[]  @default([])
+  source               String?   @default("manual")
+  resumeText           String?
+  coverLetterText      String?
+  resumePdfUrl         String?
+  coverLetterPdfUrl    String?
+  salaryMin            Int?
+  salaryMax            Int?
+  approved             Boolean   @default(false)
+  submittedAt          DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  notes                String?
+  metadata             Json?
+}
+
 model CandidatePreference {
   id                    String    @id @default(cuid())
   candidateId           String    @unique
