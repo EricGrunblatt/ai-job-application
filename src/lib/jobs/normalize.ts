@@ -85,6 +85,7 @@ export function normalizeJob(raw: Record<string, unknown>): Job {
     sourceJobId: typeof raw.sourceJobId === "string" ? raw.sourceJobId : undefined,
     url: typeof raw.url === "string" ? raw.url : undefined,
     company: String(raw.company ?? "Unknown Company").trim(),
+    companySummary: typeof raw.companySummary === "string" ? raw.companySummary.trim() : undefined,
     title: String(raw.title ?? "Untitled Role").trim(),
     description: String(raw.description ?? "").trim(),
     location: location.length ? location : ["Unknown location"],

@@ -1,7 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+
+import type { Job } from "@/types/job";
+
+import { ericGrunblattProfile } from "@/lib/candidate/profile";
+import { matchJobToProfile, salaryRangeOverlaps } from "@/lib/jobs/matching";
 import { sampleJob } from "@/lib/jobs/sample";
+
+const salaryFloor = 50000;
+const salaryCeiling = 250000;
+
+type SortOption = "match-desc" | "match-asc" | "date-desc" | "date-asc";
+
+const jobQueue: Job[] = [
+  sampleJob,
+  {
+    ...sampleJob,
+    id: "job-demo-2",
+    company: "Signal Forge",
+    title: "Senior Site Reliability Engineer",
+    description:
+      "Lead reliability improvements, observability strategy, and operational automation across production systems in a cloud-native environment.",
+    salary: { min: 185000, max: 220000, currency: "USD", period: "annual" as const },
+    requiredSkills: ["Kubernetes", "Observability", "Terraform", "Go"],
+    preferredSkills: ["Grafana", "Prometheus", "AWS", "Leadership"],
+    publishedAt: "2026-09-20T00:00:00Z",
+  },
+  {
+    ...sampleJob,
+    id: "job-demo-3",
+    company: "North Harbor",
+    title: "DevOps Engineer",
+    description:
+      "Own CI/CD pipelines, configuration management, and infrastructure reliability for product teams shipping customer-facing services.",
+    salary: { min: 145000, max: 180000, currency: "USD", period: "annual" as const },
+    requiredSkills: ["GitHub Actions", "Docker", "AWS", "Linux"],
+    preferredSkills: ["Python", "Terraform", "Monitoring"],
+    publishedAt: "2026-09-18T00:00:00Z",
+  },
+];
 
 function formatLabel(value: string | undefined, fallback: string) {
   if (!value) return fallback;
@@ -25,33 +64,22 @@ function formatDate(value: string | undefined) {
   }).format(date);
 }
 
-const jobQueue = [
-  sampleJob,
-  {
-    ...sampleJob,
-    id: "job-demo-2",
-    company: "Signal Forge",
-    title: "Senior Site Reliability Engineer",
-    description:
-      "Lead reliability improvements, observability strategy, and operational automation across production systems in a cloud-native environment.",
-    salary: { min: 185000, max: 220000, currency: "USD", period: "annual" },
-    requiredSkills: ["Kubernetes", "Observability", "Terraform", "Go"],
-    preferredSkills: ["Grafana", "Prometheus", "AWS", "Leadership"],
-    publishedAt: "2026-09-20T00:00:00Z",
-  },
-  {
-    ...sampleJob,
-    id: "job-demo-3",
-    company: "North Harbor",
-    title: "DevOps Engineer",
-    description:
-      "Own CI/CD pipelines, configuration management, and infrastructure reliability for product teams shipping customer-facing services.",
-    salary: { min: 145000, max: 180000, currency: "USD", period: "annual" },
-    requiredSkills: ["GitHub Actions", "Docker", "AWS", "Linux"],
-    preferredSkills: ["Python", "Terraform", "Monitoring"],
-    publishedAt: "2026-09-18T00:00:00Z",
-  },
-];
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function getSalaryBounds(job: (typeof jobQueue)[number]) {
+  if (!job.salary) return { min: salaryFloor, max: salaryCeiling };
+
+  return {
+    min: job.salary.min ?? job.salary.max ?? salaryFloor,
+    max: job.salary.max ?? job.salary.min ?? salaryCeiling,
+  };
+}
 
 export default function JobsPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -65,6 +93,19 @@ export default function JobsPage() {
   const [lastSearchMessage, setLastSearchMessage] = useState("No search run yet");
   const [pageSize, setPageSize] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
+  const [draftFilterState, setDraftFilterState] = useState({
+    from: "",
+    to: "",
+    salaryMin: salaryFloor,
+    salaryMax: salaryCeiling,
+  });
+  const [appliedFilterState, setAppliedFilterState] = useState({
+    from: "",
+    to: "",
+    salaryMin: salaryFloor,
+    salaryMax: salaryCeiling,
+  });
+  const [sortBy, setSortBy] = useState<SortOption>("match-desc");
 
   const currentCriteria = {
     roles: criteria.roles
@@ -79,7 +120,48 @@ export default function JobsPage() {
     salary: criteria.salary ? `$${Number(criteria.salary).toLocaleString()}+` : "No minimum",
   };
 
-  const allSelected = selectedIds.length === jobQueue.length && jobQueue.length > 0;
+  const evaluatedJobs = useMemo(
+    () =>
+      jobQueue.map((job) => ({
+        job,
+        match: matchJobToProfile(ericGrunblattProfile, job),
+      })),
+    [],
+  );
+
+  const filteredJobs = useMemo(() => {
+    const normalized = evaluatedJobs.filter(({ job }) => {
+      const publishedDate = job.publishedAt ? new Date(job.publishedAt) : new Date(0);
+      const fromDate = appliedFilterState.from ? new Date(appliedFilterState.from) : null;
+      const toDate = appliedFilterState.to ? new Date(`${appliedFilterState.to}T23:59:59Z`) : null;
+
+      if (fromDate && publishedDate < fromDate) return false;
+      if (toDate && publishedDate > toDate) return false;
+
+      const jobSalaryRange = getSalaryBounds(job);
+      if (!salaryRangeOverlaps(jobSalaryRange, appliedFilterState.salaryMin, appliedFilterState.salaryMax)) {
+        return false;
+      }
+
+      return true;
+    });
+
+    return [...normalized].sort((a, b) => {
+      switch (sortBy) {
+        case "match-asc":
+          return a.match.skillMatchScore - b.match.skillMatchScore;
+        case "date-asc":
+          return new Date(a.job.publishedAt ?? 0).getTime() - new Date(b.job.publishedAt ?? 0).getTime();
+        case "date-desc":
+          return new Date(b.job.publishedAt ?? 0).getTime() - new Date(a.job.publishedAt ?? 0).getTime();
+        case "match-desc":
+        default:
+          return b.match.skillMatchScore - a.match.skillMatchScore;
+      }
+    });
+  }, [appliedFilterState, evaluatedJobs, sortBy]);
+
+  const allSelected = filteredJobs.length > 0 && selectedIds.length === filteredJobs.length;
 
   const handleAiSearch = () => {
     setIsSearching(true);
@@ -92,9 +174,14 @@ export default function JobsPage() {
     }, 1000);
   };
 
-  const totalPages = Math.max(1, Math.ceil(jobQueue.length / pageSize));
+  const handleApplyFilters = () => {
+    setAppliedFilterState(draftFilterState);
+    setCurrentPage(1);
+  };
+
+  const totalPages = Math.max(1, Math.ceil(filteredJobs.length / pageSize));
   const currentPageSafe = Math.min(currentPage, totalPages);
-  const paginatedJobs = jobQueue.slice(
+  const paginatedJobs = filteredJobs.slice(
     (currentPageSafe - 1) * pageSize,
     currentPageSafe * pageSize,
   );
@@ -106,7 +193,7 @@ export default function JobsPage() {
   };
 
   const toggleSelectAll = () => {
-    setSelectedIds((current) => (current.length === jobQueue.length ? [] : jobQueue.map((job) => job.id)));
+    setSelectedIds((current) => (current.length === filteredJobs.length ? [] : filteredJobs.map(({ job }) => job.id)));
   };
 
   const selectedCount = selectedIds.length;
@@ -281,6 +368,26 @@ export default function JobsPage() {
           </div>
 
           <div className="flex items-center gap-2 text-sm text-slate-700">
+            <label htmlFor="sort-by" className="font-medium">
+              Sort by
+            </label>
+            <select
+              id="sort-by"
+              value={sortBy}
+              onChange={(event) => {
+                setSortBy(event.target.value as SortOption);
+                setCurrentPage(1);
+              }}
+              className="rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-sm text-slate-800 shadow-sm outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100"
+            >
+              <option value="match-desc">Skill match: high to low</option>
+              <option value="match-asc">Skill match: low to high</option>
+              <option value="date-desc">Date posted: newest</option>
+              <option value="date-asc">Date posted: oldest</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2 text-sm text-slate-700">
             <button
               type="button"
               onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
@@ -303,8 +410,117 @@ export default function JobsPage() {
           </div>
         </div>
 
+        <div className="mb-6 grid gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium text-slate-700">
+              <span className="mb-2 block">Posted date range</span>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <input
+                  type="date"
+                  value={draftFilterState.from}
+                  onChange={(event) => {
+                    setDraftFilterState((current) => ({ ...current, from: event.target.value }));
+                  }}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100"
+                />
+                <input
+                  type="date"
+                  value={draftFilterState.to}
+                  onChange={(event) => {
+                    setDraftFilterState((current) => ({ ...current, to: event.target.value }));
+                  }}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100"
+                />
+              </div>
+            </label>
+          </div>
+
+          <div>
+            <div className="mb-2 flex items-center justify-between gap-2 text-sm font-medium text-slate-700">
+              <span>Salary range</span>
+              <span>
+                {formatCurrency(draftFilterState.salaryMin)} - {formatCurrency(draftFilterState.salaryMax)}
+              </span>
+            </div>
+            <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-3">
+              <div className="salary-range-slider">
+                <div className="salary-range-track">
+                  <div
+                    className="salary-range-fill"
+                    style={{
+                      left: `${((draftFilterState.salaryMin - salaryFloor) / (salaryCeiling - salaryFloor)) * 100}%`,
+                      width: `${((draftFilterState.salaryMax - draftFilterState.salaryMin) / (salaryCeiling - salaryFloor)) * 100}%`,
+                    }}
+                  />
+                  <input
+                    type="range"
+                    min={salaryFloor}
+                    max={salaryCeiling}
+                    step={5000}
+                    value={draftFilterState.salaryMin}
+                    onChange={(event) => {
+                      const nextValue = Number(event.target.value);
+                      setDraftFilterState((current) => ({
+                        ...current,
+                        salaryMin: Math.min(nextValue, current.salaryMax),
+                      }));
+                    }}
+                    className="salary-range-input"
+                  />
+                  <input
+                    type="range"
+                    min={salaryFloor}
+                    max={salaryCeiling}
+                    step={5000}
+                    value={draftFilterState.salaryMax}
+                    onChange={(event) => {
+                      const nextValue = Number(event.target.value);
+                      setDraftFilterState((current) => ({
+                        ...current,
+                        salaryMax: Math.max(nextValue, current.salaryMin),
+                      }));
+                    }}
+                    className="salary-range-input"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-6 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setDraftFilterState({
+                from: "",
+                to: "",
+                salaryMin: salaryFloor,
+                salaryMax: salaryCeiling,
+              });
+              setAppliedFilterState({
+                from: "",
+                to: "",
+                salaryMin: salaryFloor,
+                salaryMax: salaryCeiling,
+              });
+              setCurrentPage(1);
+            }}
+            className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+          >
+            Reset filters
+          </button>
+          <button
+            type="button"
+            onClick={handleApplyFilters}
+            className="rounded-full bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700"
+          >
+            Apply filters
+          </button>
+        </div>
+
         <div className="space-y-6">
-          {paginatedJobs.map((job) => {
+          {paginatedJobs.map(({ job, match }) => {
             const isSelected = selectedIds.includes(job.id);
 
             return (
@@ -334,6 +550,12 @@ export default function JobsPage() {
                   </label>
 
                   <div className="flex gap-2">
+                    <Link
+                      href={`/jobs/${job.id}`}
+                      className="rounded-full border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-sky-700 hover:bg-sky-100"
+                    >
+                      View job
+                    </Link>
                     <button className="rounded-full border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-rose-700 hover:bg-rose-100">
                       Deny
                     </button>
@@ -394,7 +616,7 @@ export default function JobsPage() {
                     <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
                       Match
                     </div>
-                    <div className="mt-2 text-lg font-semibold">Strong fit</div>
+                    <div className="mt-2 text-lg font-semibold">{match.skillMatchScore}%</div>
                   </div>
                 </section>
 
@@ -402,9 +624,9 @@ export default function JobsPage() {
                   <div>
                     <h3 className="text-lg font-semibold">Why it matches</h3>
                     <ul className="mt-3 list-disc space-y-2 pl-5 text-slate-700">
-                      <li>Strong alignment with platform and cloud infrastructure work.</li>
-                      <li>Remote-first role with salary above your preferred threshold.</li>
-                      <li>Relevant CI/CD and infrastructure tooling overlap.</li>
+                      {match.reasons.map((reason) => (
+                        <li key={reason}>{reason}</li>
+                      ))}
                     </ul>
                   </div>
 
@@ -419,6 +641,18 @@ export default function JobsPage() {
                           {skill}
                         </span>
                       ))}
+                    </div>
+                    <div className="mt-4 rounded-lg border border-sky-200 bg-sky-50 p-3">
+                      <div className="flex items-center justify-between gap-3 text-sm font-medium text-sky-900">
+                        <span>Skill match</span>
+                        <span>{match.skillMatchScore}%</span>
+                      </div>
+                      <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-sky-100">
+                        <div
+                          className="h-full rounded-full bg-sky-600 transition-all"
+                          style={{ width: `${match.skillMatchScore}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </section>

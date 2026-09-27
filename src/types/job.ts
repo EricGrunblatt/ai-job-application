@@ -36,6 +36,7 @@ export interface Job {
   sourceJobId?: string;
   url?: string;
   company: string;
+  companySummary?: string;
   title: string;
   description: string;
   location: string[];

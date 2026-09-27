@@ -47,6 +47,83 @@ body {
   overflow-y: scroll;
 }
 
+.salary-range-slider {
+  position: relative;
+}
+
+.salary-range-track {
+  position: relative;
+  display: block;
+  height: 28px;
+}
+
+.salary-range-track::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 4px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  transform: translateY(-50%);
+}
+
+.salary-range-fill {
+  position: absolute;
+  top: 50%;
+  height: 4px;
+  border-radius: 999px;
+  background: #0ea5e9;
+  transform: translateY(-50%);
+}
+
+.salary-range-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 28px;
+  appearance: none;
+  background: transparent;
+  pointer-events: none;
+}
+
+.salary-range-input::-webkit-slider-runnable-track {
+  height: 4px;
+  background: transparent;
+  border-radius: 999px;
+}
+
+.salary-range-input::-moz-range-track {
+  height: 4px;
+  background: transparent;
+  border-radius: 999px;
+}
+
+.salary-range-input::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #0ea5e9;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.2), 0 6px 18px rgba(14, 165, 233, 0.18);
+  margin-top: -7px;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.salary-range-input::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #0ea5e9;
+  box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.2), 0 6px 18px rgba(14, 165, 233, 0.18);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 .profile-page {
   max-width: 1180px;
   margin: 0 auto;

@@ -7,6 +7,8 @@ export const sampleJob: Job = normalizeJob({
   sourceJobId: "eng-platform-001",
   url: "https://example.com/jobs/platform-engineer",
   company: "Northstar Labs",
+  companySummary:
+    "Northstar Labs builds developer-facing infrastructure and internal platform tooling for teams shipping complex cloud applications at scale. The company is focused on making engineering systems more reliable, automatable, and self-serve.",
   title: "Senior Platform Engineer",
   description:
     "Build and operate developer workflows, infrastructure automation, and deployment standards across cloud and CI/CD systems.",
