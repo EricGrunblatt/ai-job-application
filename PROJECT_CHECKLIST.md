@@ -82,6 +82,24 @@ Status: In progress — the candidate profile and resume-import flow are working
 - [x] Question review/edit flow
 - [x] Explicit approval gate
 
+### Pre-Browser-Automation UI Gate (must be complete before Milestone 9)
+- [ ] Real login flow works end-to-end, including sign up and sign in
+- [ ] New user onboarding requires profile creation immediately after signup
+- [ ] The app requires a resume PDF upload during onboarding instead of text paste/import-only workflows
+- [ ] Resume PDF parsing is performed by AI and used to auto-populate the candidate profile metadata, including name, contact info, experience, education, skills, and projects when present
+- [ ] Uploaded resume data is treated as editable user data, not immutable system output; the user can correct incorrect AI-extracted fields
+- [ ] Personal identity fields (name, email, phone, location, contact links, profile settings) are managed in a profile settings area rather than the general experience editor
+- [ ] Experience-related fields (jobs, responsibilities, skills, projects, education, certifications, achievements) are editable directly from the main profile page
+- [ ] The profile editing experience supports full CRUD for work history, projects, certifications, education, skills, and bullet points without requiring a hidden or unsupported editing flow
+- [ ] The home screen or dashboard presents a clear linear user workflow: 1) login/signup, 2) upload resume, 3) review and edit profile, 4) search jobs, 5) review matches, 6) prepare application, 7) review final materials, 8) approve before submission
+- [ ] The app surfaces short instructional copy and navigation hints so a first-time user can tell what to do next without needing a walkthrough
+- [ ] The generated resume PDF is visually polished and human-readable, not just machine-friendly; it should resemble a clean professional resume with clear sections, readable spacing, and strong balance between AI parseability and human scanning
+- [ ] The generated resume format should keep the structure close to the user's actual resume reference (for example: name, contact block, skills, experience sections, education, distinct role formatting) while remaining deterministic and suitable for AI-driven tailoring
+- [ ] The generated resume output preserves strong readability for real humans while still including structured, machine-friendly data that supports future tailoring and extraction
+- [ ] Final generated files include both the resume PDF and the cover letter PDF in the review flow and make them easy to open/download from the UI
+- [ ] The user can review the generated cover letter PDF alongside the resume PDF before approval and submission
+- [ ] No Playwright or browser automation work begins until the onboarding, profile editing, workflow clarity, and generated document quality requirements above are implemented and manually verified
+
 ### Milestone 9 — Browser Automation
 - [ ] Playwright service
 - [ ] Application adapter abstraction

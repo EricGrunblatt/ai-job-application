@@ -53,7 +53,7 @@ export default function LoginPage() {
         throw new Error(data.error ?? "Authentication failed.");
       }
 
-      router.push("/");
+      router.push(mode === "register" ? "/onboarding" : "/");
       router.refresh();
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Authentication failed.");
